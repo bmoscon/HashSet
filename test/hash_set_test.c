@@ -72,6 +72,7 @@ int main()
   
   hash_set_st *set = hash_set_init(50, chksum);
   hash_set_insert(set, a);
+  hash_set_insert(set, a);
   hash_set_insert(set, b);
   printf("does \"%s\" exist: %d\n", a, hash_set_exists(set, a));
   printf("does \"%s\" exist: %d\n", z, hash_set_exists(set, z));
