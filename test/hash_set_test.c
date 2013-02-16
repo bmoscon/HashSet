@@ -51,8 +51,9 @@
 
 
 
-uint32_t chksum(char *s) 
+uint32_t chksum(void *str) 
 {
+  char *s = (char *)str;
   int len = strlen(s);
   int i;
   uint32_t c = 0;

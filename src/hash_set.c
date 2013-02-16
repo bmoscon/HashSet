@@ -49,7 +49,7 @@
 #include "hash_set.h"
 
 
-hash_set_st* hash_set_init(size_t size, uint32_t (*hash_fp)(char *)) 
+hash_set_st* hash_set_init(size_t size, uint32_t (*hash_fp)(void *)) 
 {
   hash_set_st *ret = NULL;
 
@@ -88,13 +88,13 @@ void hash_set_free(hash_set_st *set)
   free(set);
 }
 
-void hash_set_insert(hash_set_st *set, char *c)
+void hash_set_insert(hash_set_st *set, void *val)
 {
   uint32_t hash;
   uint32_t index;
   
 
-  hash = set->hash_fp(c);
+  hash = set->hash_fp(val);
   index = hash % set->len;
 
   if (!set->array[index].hash) {
@@ -136,7 +136,7 @@ void hash_set_insert(hash_set_st *set, char *c)
   ++set->entries;
 }
 
-int hash_set_exists(hash_set_st *set, char *val)
+int hash_set_exists(hash_set_st *set, void *val)
 {
   uint32_t hash;
   uint32_t index;

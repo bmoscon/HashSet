@@ -61,15 +61,15 @@ typedef struct hash_set_st {
   uint32_t entries;
   uint32_t overflow;
   size_t len;
-  uint32_t (*hash_fp)(char *);
+  uint32_t (*hash_fp)(void *);
   bucket_st *array;
 } hash_set_st;
 
 
-hash_set_st* hash_set_init(size_t size, uint32_t (*hash_fp)(char *));
+hash_set_st* hash_set_init(size_t size, uint32_t (*hash_fp)(void *));
 void hash_set_free(hash_set_st *set);
-int hash_set_exists(hash_set_st *set, char *val);
-void hash_set_insert(hash_set_st *set, char *c);
+int hash_set_exists(hash_set_st *set, void *val);
+void hash_set_insert(hash_set_st *set, void *val);
 
 
 
