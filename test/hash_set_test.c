@@ -66,7 +66,15 @@ uint32_t chksum(char *s)
 
 int main()
 {
+  char *a = "meow meow";
+  char *b = "nimbus is a grey cat";
+  char *z = "does not exist";
+  
   hash_set_st *set = hash_set_init(50, chksum);
+  hash_set_insert(set, a);
+  hash_set_insert(set, b);
+  printf("does \"%s\" exist: %d\n", a, hash_set_exists(set, a));
+  printf("does \"%s\" exist: %d\n", z, hash_set_exists(set, z));
   hash_set_free(set);
   
   return 0;
