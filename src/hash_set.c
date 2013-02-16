@@ -93,12 +93,15 @@ void hash_set_insert(hash_set_st *set, char *c)
   uint32_t hash;
   uint32_t index;
 
+  ++set->entries;
+
   hash = set->hash_fp(c);
   index = hash % set->len;
 
   if (!set->array[index].hash) {
     set->array[index].hash = hash;
   } else {
+    ++set->overflow;
     if (set->array[index].next == NULL) {
       set->array[index].next = malloc(sizeof(bucket_st));
       set->array[index].next->hash = hash;
