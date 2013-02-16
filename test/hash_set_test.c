@@ -75,6 +75,9 @@ int main()
   hash_set_insert(set, b);
   printf("does \"%s\" exist: %d\n", a, hash_set_exists(set, a));
   printf("does \"%s\" exist: %d\n", z, hash_set_exists(set, z));
+  
+  printf("total entries: %d, total overflows: %d\n", set->entries, set->overflow);
+  
   hash_set_free(set);
   
   return 0;

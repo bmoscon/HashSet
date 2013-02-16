@@ -92,8 +92,7 @@ void hash_set_insert(hash_set_st *set, char *c)
 {
   uint32_t hash;
   uint32_t index;
-
-  ++set->entries;
+  
 
   hash = set->hash_fp(c);
   index = hash % set->len;
@@ -101,23 +100,40 @@ void hash_set_insert(hash_set_st *set, char *c)
   if (!set->array[index].hash) {
     set->array[index].hash = hash;
   } else {
-    ++set->overflow;
+    if (set->array[index].hash == hash) {
+      // no duplicates allowed
+      return;
+    }
+    
     if (set->array[index].next == NULL) {
       set->array[index].next = malloc(sizeof(bucket_st));
       set->array[index].next->hash = hash;
       set->array[index].next->next = NULL;
+      ++set->overflow;
     } else {
       bucket_st *b = set->array[index].next;
       
       while (b->next) {
+	if (b->hash == hash) {
+	  // no duplicates allowed
+	  return;
+	}
+	
 	b = b->next;
+      }
+
+      if (b->hash == hash) {
+	// no duplicates allowed
+	return;
       }
       
       b->next = malloc(sizeof(bucket_st));
       b->next->hash = hash;
       b->next->next = NULL;
+      ++set->overflow;
     }
   }
+  ++set->entries;
 }
 
 int hash_set_exists(hash_set_st *set, char *val)
