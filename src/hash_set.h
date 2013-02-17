@@ -70,6 +70,7 @@ hash_set_st* hash_set_init(size_t size, uint32_t (*hash_fp)(void *));
 void hash_set_free(hash_set_st *set);
 int hash_set_exists(hash_set_st *set, void *val);
 void hash_set_insert(hash_set_st *set, void *val);
+void hash_set_clear(hash_set_st *set);
 
 
 

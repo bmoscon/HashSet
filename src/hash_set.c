@@ -45,6 +45,7 @@
  */
 
 #include <assert.h>
+#include <string.h>
 
 #include "hash_set.h"
 
@@ -154,5 +155,33 @@ int hash_set_exists(hash_set_st *set, void *val)
   }
   
   return (0);
+}
+
+void hash_set_clear(hash_set_st *set)
+{
+  bucket_st *next = NULL;
+  size_t i;
+  
+  if (!set) {
+    return;
+  }
+
+  if (set->overflow) {
+    // free all 'overflow' bucket entries
+    for (i = 0; i < set->len; ++i) {
+      next = set->array[i].next;
+      while (next) {
+	set->array[i].next = next->next;
+	free(next);
+	next = set->array[i].next;
+      }
+    } 
+  }
+
+  memset(set->array, 0, set->len * sizeof(bucket_st));
+  
+  set->overflow = 0;
+  set->entries = 0;
+
 }
 

@@ -79,6 +79,10 @@ int main()
   printf("does \"%s\" exist: %d\n", z, hash_set_exists(set, z));
   
   printf("total entries: %d, total overflows: %d\n", set->entries, set->overflow);
+
+  hash_set_clear(set);
+
+  printf("clearing hash set and testing again for \"%s\": %d\n", a, hash_set_exists(set, a));
   
   hash_set_free(set);
   
