@@ -46,6 +46,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <assert.h>
 
 #include "hash_set.h"
 
@@ -57,12 +58,14 @@ hash_set_st* hash_set_init(size_t size, uint32_t (*hash_fp)(void *))
   assert(size > 0);
 
   ret = (hash_set_st *)malloc(sizeof(hash_set_st));
-  
+  assert(ret);
+
   ret->entries = 0;
   ret->overflow = 0;
   ret->hash_fp = hash_fp;
   ret->len = size;
   ret->array = calloc(size, sizeof(bucket_st));
+  assert(ret->array);
 
   return (ret);
 }
@@ -108,6 +111,7 @@ void hash_set_insert(hash_set_st *set, void *val)
     
     if (set->array[index].next == NULL) {
       set->array[index].next = malloc(sizeof(bucket_st));
+      assert(set->array[index].next);
       set->array[index].next->hash = hash;
       set->array[index].next->next = NULL;
       ++set->overflow;
@@ -129,6 +133,7 @@ void hash_set_insert(hash_set_st *set, void *val)
       }
       
       b->next = malloc(sizeof(bucket_st));
+      assert(b->next);
       b->next->hash = hash;
       b->next->next = NULL;
       ++set->overflow;
