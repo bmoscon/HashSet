@@ -72,17 +72,17 @@ int main()
   char *z = "does not exist";
   
   hash_set_st *set = hash_set_init(50, chksum);
-  hash_set_insert(set, a);
-  hash_set_insert(set, a);
-  hash_set_insert(set, b);
-  printf("does \"%s\" exist: %d\n", a, hash_set_exists(set, a));
-  printf("does \"%s\" exist: %d\n", z, hash_set_exists(set, z));
+  hash_set_insert(set, a, strlen(a));
+  hash_set_insert(set, a, strlen(a));
+  hash_set_insert(set, b, strlen(b));
+  printf("does \"%s\" exist: %d\n", a, hash_set_exists(set, a, strlen(a)));
+  printf("does \"%s\" exist: %d\n", z, hash_set_exists(set, z, strlen(z)));
   
   printf("total entries: %d, total overflows: %d\n", set->entries, set->overflow);
 
   hash_set_clear(set);
 
-  printf("clearing hash set and testing again for \"%s\": %d\n", a, hash_set_exists(set, a));
+  printf("clearing hash set and testing again for \"%s\": %d\n", a, hash_set_exists(set, a, strlen(a)));
   
   hash_set_free(set);
   

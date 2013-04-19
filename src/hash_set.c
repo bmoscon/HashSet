@@ -82,8 +82,10 @@ void hash_set_free(hash_set_st *set)
 
   for (i = 0; i < set->len; ++i) {
     next = set->array[i].next;
+    free(set->array[i].value);
     while (next) {
       set->array[i].next = next->next;
+      free(next->value);
       free(next);
       next = set->array[i].next;
     }
@@ -92,21 +94,28 @@ void hash_set_free(hash_set_st *set)
   free(set);
 }
 
-void hash_set_insert(hash_set_st *set, void *val)
+void hash_set_insert(hash_set_st *set, void *val, size_t size)
 {
   uint32_t hash;
   uint32_t index;
   
-
   hash = set->hash_fp(val);
   index = hash % set->len;
 
   if (!set->array[index].hash) {
     set->array[index].hash = hash;
+    set->array[index].value = malloc(size);
+    assert(set->array[index].value);
+    memcpy(set->array[index].value, val, size);
+    set->array[index].size = size;
   } else {
     if (set->array[index].hash == hash) {
-      // no duplicates allowed
-      return;
+      if (size == set->array[index].size) {
+	if (memcmp(set->array[index].value, val, size) == 0) {
+	  // mp duplicates allowed
+	  return;
+	}
+      } 
     }
     
     if (set->array[index].next == NULL) {
@@ -120,16 +129,24 @@ void hash_set_insert(hash_set_st *set, void *val)
       
       while (b->next) {
 	if (b->hash == hash) {
-	  // no duplicates allowed
-	  return;
+	  if (b->size == size) {
+	    if (memcmp(b->value, val, size == 0)) {
+	      // no duplicates allowed
+	      return;
+	    }
+	  }
 	}
 	
 	b = b->next;
       }
 
       if (b->hash == hash) {
-	// no duplicates allowed
-	return;
+	if (b->size == size) {
+	  if (memcmp(b->value, val, size == 0)) {
+	    // no duplicates allowed
+	    return;
+	  }
+	}
       }
       
       b->next = malloc(sizeof(bucket_st));
@@ -142,7 +159,7 @@ void hash_set_insert(hash_set_st *set, void *val)
   ++set->entries;
 }
 
-int hash_set_exists(hash_set_st *set, void *val)
+int hash_set_exists(hash_set_st *set, void *val, size_t size)
 {
   uint32_t hash;
   uint32_t index;
@@ -153,8 +170,12 @@ int hash_set_exists(hash_set_st *set, void *val)
   b = &(set->array[index]);
   
   while (b) {
-    if (b->hash == hash) {
-      return (1);
+    if (size == b->size) {
+      if (b->hash == hash) {
+	if (memcmp(b->value, val, size) == 0) {
+	  return (1);
+	}
+      }
     }
     b = b->next;
   }
@@ -175,8 +196,10 @@ void hash_set_clear(hash_set_st *set)
     // free all 'overflow' bucket entries
     for (i = 0; i < set->len; ++i) {
       next = set->array[i].next;
+      free(set->array[i].value);
       while (next) {
 	set->array[i].next = next->next;
+	free(next->value);
 	free(next);
 	next = set->array[i].next;
       }

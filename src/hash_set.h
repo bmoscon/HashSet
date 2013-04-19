@@ -53,6 +53,8 @@
 
 typedef struct bucket_st {
   uint32_t hash;
+  size_t size;
+  void *value;
   struct bucket_st *next;
 } bucket_st;
 
@@ -68,8 +70,8 @@ typedef struct hash_set_st {
 
 hash_set_st* hash_set_init(size_t size, uint32_t (*hash_fp)(void *));
 void hash_set_free(hash_set_st *set);
-int hash_set_exists(hash_set_st *set, void *val);
-void hash_set_insert(hash_set_st *set, void *val);
+int hash_set_exists(hash_set_st *set, void *val, size_t size);
+void hash_set_insert(hash_set_st *set, void *val, size_t size);
 void hash_set_clear(hash_set_st *set);
 
 
