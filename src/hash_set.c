@@ -213,3 +213,79 @@ void hash_set_clear(hash_set_st *set)
 
 }
 
+
+/*
+ * Helper function that finds first non-empty bucket and inits 
+ * the iterator accordingly
+ *
+ */
+static void init_bucket(hash_set_it *it)
+{
+  bucket_st *b = it->set->array;
+  uint32_t i = 0;
+
+  while (!b->hash) {
+    ++i;
+    b = &(it->set->array[i]);
+  }
+
+  it->current = b;
+  it->index = i;
+}
+
+
+hash_set_it* it_init(hash_set_st *set)
+{
+  hash_set_it* ret;
+  ret = malloc(sizeof(hash_set_it));
+
+  assert(ret);
+
+  ret->index = 0;
+  ret->current = NULL;
+  ret->set = set;
+
+  init_bucket(ret);
+  
+  
+  return (ret);
+}
+
+
+void it_next(hash_set_it *it)
+{
+  bucket_st *b;
+  uint32_t index;
+
+  // check if there are overflowed buckets in our current position in the array
+  if (it->current->next) {
+    it->current = it->current->next;
+    return;
+  }
+
+  index = it->index + 1;
+  b = &(it->set->array[index]);
+  
+  while (!b->hash) {
+    ++index;
+    b = &(it->set->array[index]);
+  }
+  
+  it->current = b;
+  it->index = index;
+}
+
+void it_prev(hash_set_it *it)
+{
+
+}
+
+void* it_value(hash_set_it *it)
+{
+  return (it->current->value);
+}
+
+void it_free(hash_set_it *it)
+{
+  free(it);
+}
