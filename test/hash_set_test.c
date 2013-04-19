@@ -86,7 +86,9 @@ int main()
   printf("1: %s\n", (char *)it_value(it));
   it_next(it);
   printf("2: %s\n", (char *)it_value(it));
+  it_free(it);
 
+  
   hash_set_clear(set);
 
   printf("clearing hash set and testing again for \"%s\": %d\n", a, hash_set_exists(set, a, strlen(a)));
