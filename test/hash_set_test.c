@@ -83,10 +83,12 @@ int main()
 
   printf("\nIterator test\n");
   it = it_init(set);
-  printf("1: %s\n", (char *)it_value(it));
-  it_next(it);
-  printf("2: %s\n", (char *)it_value(it));
-  it_free(it);
+  if (it) {
+    do {
+      printf("%s\n", (char *)it_value(it));
+    } while (it_next(it) == 0);
+    it_free(it);
+  }
 
   
   hash_set_clear(set);

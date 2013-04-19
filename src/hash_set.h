@@ -85,7 +85,7 @@ void hash_set_clear(hash_set_st *set);
 
 // Hash Set Iterator Function Definitions
 hash_set_it* it_init(hash_set_st *set);
-void it_next(hash_set_it *it);
+int it_next(hash_set_it *it);
 void it_prev(hash_set_it *it);
 void* it_value(hash_set_it *it);
 void it_free(hash_set_it *it);
