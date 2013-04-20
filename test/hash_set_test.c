@@ -46,10 +46,13 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "../src/hash_set.h"
 
 
+#define SET_LEN 503
+#define SET_SIZE 50000
 
 uint32_t chksum(void *str) 
 {
@@ -65,36 +68,55 @@ uint32_t chksum(void *str)
   return (c);
 }
 
+uint32_t hash_int(void *number) {
+  return (*(int *)number);
+}
+
 int main()
 {
-  char *a = "meow meow";
-  char *b = "nimbus is a grey cat";
-  char *z = "does not exist";
-  hash_set_it* it;
+  hash_set_st *set = hash_set_init(SET_LEN, hash_int);
+  int i;
+  hash_set_it *it;
 
-  hash_set_st *set = hash_set_init(50, chksum);
-  hash_set_insert(set, a, strlen(a));
-  hash_set_insert(set, a, strlen(a));
-  hash_set_insert(set, b, strlen(b));
-  printf("does \"%s\" exist: %d\n", a, hash_set_exists(set, a, strlen(a)));
-  printf("does \"%s\" exist: %d\n", z, hash_set_exists(set, z, strlen(z)));
-  
-  printf("total entries: %d, total overflows: %d\n", set->entries, set->overflow);
-
-  printf("\nIterator test\n");
-  it = it_init(set);
-  if (it) {
-    do {
-      printf("%s\n", (char *)it_value(it));
-    } while (it_next(it) != END);
-    it_free(it);
+  printf("verifying inserts with overflow...\n");
+  for(i = 0; i < SET_SIZE; ++i) {
+    assert(hash_set_insert(set, &i, sizeof(int)));
   }
 
-  
-  hash_set_clear(set);
+  printf("verifying duplicate inserts fail...\n");
+  for(i = 0; i < SET_SIZE; ++i) {
+    assert(hash_set_insert(set, &i, sizeof(int)) == DUPLICATE);
+  }
 
-  printf("clearing hash set and testing again for \"%s\": %d\n", a, hash_set_exists(set, a, strlen(a)));
+  printf("verifying data structure integrity...\n");
+  assert(set->len == SET_LEN);
+  if (SET_SIZE > SET_LEN) {
+    assert(set->overflow >= SET_SIZE - SET_LEN);
+  }
+  assert(set->entries == SET_SIZE);
   
+  printf("verifying values exist...\n");
+  for(i = 0; i < SET_SIZE; ++i) {
+    assert(hash_set_exists(set, &i, sizeof(int)));
+  }
+
+  printf("verifying non-present values fail existence test...\n");
+  for(i = SET_SIZE; i < SET_SIZE*10; ++i) {
+    assert(hash_set_exists(set, &i, sizeof(int)) == FALSE);
+  }
+
+  printf("iterator test...\n");
+  it = it_init(set);
+  assert(it);
+
+  // start at 1 beause init'ing the iterator 
+  // gives us the first value, so we only have 49,999 more to test
+  for (i = 1; i < SET_SIZE; ++i) {
+    assert(*(int *)it_value(it) < SET_SIZE);
+    assert(it_next(it) == OK);
+  }
+  
+  it_free(it);
   hash_set_free(set);
   
   return 0;

@@ -94,69 +94,56 @@ void hash_set_free(hash_set_st *set)
   free(set);
 }
 
-void hash_set_insert(hash_set_st *set, void *val, size_t size)
+int hash_set_insert(hash_set_st *set, void *val, size_t size)
 {
   uint32_t hash;
   uint32_t index;
   
   hash = set->hash_fp(val);
   index = hash % set->len;
-
-  if (!set->array[index].hash) {
+  
+  if (hash_set_exists(set, val, size)) {
+    return (DUPLICATE);
+  }
+  
+  if (!set->array[index].value) {
     set->array[index].hash = hash;
     set->array[index].value = malloc(size);
     assert(set->array[index].value);
     memcpy(set->array[index].value, val, size);
     set->array[index].size = size;
   } else {
-    if (set->array[index].hash == hash) {
-      if (size == set->array[index].size) {
-	if (memcmp(set->array[index].value, val, size) == 0) {
-	  // mp duplicates allowed
-	  return;
-	}
-      } 
-    }
-    
     if (set->array[index].next == NULL) {
       set->array[index].next = malloc(sizeof(bucket_st));
       assert(set->array[index].next);
       set->array[index].next->hash = hash;
       set->array[index].next->next = NULL;
+      set->array[index].next->value = malloc(size);
+      assert(set->array[index].next->value);
+      memcpy(set->array[index].next->value, val, size);
+      set->array[index].next->size = size;
       ++set->overflow;
     } else {
       bucket_st *b = set->array[index].next;
-      
       while (b->next) {
-	if (b->hash == hash) {
-	  if (b->size == size) {
-	    if (memcmp(b->value, val, size == 0)) {
-	      // no duplicates allowed
-	      return;
-	    }
-	  }
-	}
-	
 	b = b->next;
-      }
-
-      if (b->hash == hash) {
-	if (b->size == size) {
-	  if (memcmp(b->value, val, size == 0)) {
-	    // no duplicates allowed
-	    return;
-	  }
-	}
       }
       
       b->next = malloc(sizeof(bucket_st));
       assert(b->next);
       b->next->hash = hash;
       b->next->next = NULL;
+      b->next->value = malloc(size);
+      assert(b->next->value);
+      memcpy(b->next->value, val, size);
+      b->next->size = size;
+      
       ++set->overflow;
     }
   }
+
   ++set->entries;
+  return (OK);
 }
 
 int hash_set_exists(hash_set_st *set, void *val, size_t size)
@@ -164,23 +151,25 @@ int hash_set_exists(hash_set_st *set, void *val, size_t size)
   uint32_t hash;
   uint32_t index;
   bucket_st *b;
+
   hash = set->hash_fp(val);
   index = hash % set->len;
-  
+
   b = &(set->array[index]);
-  
-  while (b) {
+
+  while (b && b->value) {
     if (size == b->size) {
       if (b->hash == hash) {
 	if (memcmp(b->value, val, size) == 0) {
-	  return (1);
+	  return (TRUE);
 	}
       }
     }
+    
     b = b->next;
   }
-  
-  return (0);
+
+  return (FALSE);
 }
 
 void hash_set_clear(hash_set_st *set)
@@ -213,7 +202,6 @@ void hash_set_clear(hash_set_st *set)
 
 }
 
-
 /*
  * Helper function that finds first non-empty bucket and inits 
  * the iterator accordingly
@@ -225,13 +213,13 @@ static int init_bucket(hash_set_it *it)
   uint32_t i = 0;
 
   if (!b) {
-    return (EMPTY);
+    return (ERROR);
   }
   
-  while (!b->hash) {
+  while (!b->value) {
     ++i;
     if (i > it->set->len) {
-      return (EMPTY);
+      return (ERROR);
     }
     b = &(it->set->array[i]);
   }
@@ -273,13 +261,16 @@ int it_next(hash_set_it *it)
     return (OK);
   }
 
+  
+  // no more buckets in our current index, so increment index 
+  // and seach for non-empty bucket
   index = it->index + 1;
   if (index > it->set->len) {
     return (END);
   }
   b = &(it->set->array[index]);
   
-  while (!b->hash) {
+  while (!b->value) {
     ++index;
     if (index > it->set->len) {
       return (END);

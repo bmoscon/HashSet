@@ -75,11 +75,15 @@ typedef struct hash_set_it {
   const hash_set_st* set;
 } hash_set_it;
 
+enum bool {
+  FALSE = 0,
+  TRUE
+};
 
-enum it_return {
-  OK = 0,
-  EMPTY,
-  START,
+enum hash_return {
+  ERROR = 0,
+  OK = 1,
+  DUPLICATE,
   END
 };
 
@@ -87,7 +91,7 @@ enum it_return {
 hash_set_st* hash_set_init(size_t size, uint32_t (*hash_fp)(void *));
 void hash_set_free(hash_set_st *set);
 int hash_set_exists(hash_set_st *set, void *val, size_t size);
-void hash_set_insert(hash_set_st *set, void *val, size_t size);
+int hash_set_insert(hash_set_st *set, void *val, size_t size);
 void hash_set_clear(hash_set_st *set);
 
 
