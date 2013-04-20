@@ -225,13 +225,13 @@ static int init_bucket(hash_set_it *it)
   uint32_t i = 0;
 
   if (!b) {
-    return (-1);
+    return (EMPTY);
   }
   
   while (!b->hash) {
     ++i;
     if (i > it->set->len) {
-      return (-1);
+      return (EMPTY);
     }
     b = &(it->set->array[i]);
   }
@@ -239,7 +239,7 @@ static int init_bucket(hash_set_it *it)
   it->current = b;
   it->index = i;
   
-  return (0);
+  return (OK);
 }
 
 
@@ -254,7 +254,7 @@ hash_set_it* it_init(hash_set_st *set)
   ret->current = NULL;
   ret->set = set;
 
-  if (init_bucket(ret) != 0) {
+  if (init_bucket(ret) != OK) {
     return (NULL);
   } 
   
@@ -270,19 +270,19 @@ int it_next(hash_set_it *it)
   // check if there are overflowed buckets in our current position in the array
   if (it->current->next) {
     it->current = it->current->next;
-    return (0);
+    return (OK);
   }
 
   index = it->index + 1;
   if (index > it->set->len) {
-    return (-1);
+    return (END);
   }
   b = &(it->set->array[index]);
   
   while (!b->hash) {
     ++index;
     if (index > it->set->len) {
-      return (-1);
+      return (END);
     }
     b = &(it->set->array[index]);
   }
@@ -290,12 +290,7 @@ int it_next(hash_set_it *it)
   it->current = b;
   it->index = index;
   
-  return (0);
-}
-
-void it_prev(hash_set_it *it)
-{
-
+  return (OK);
 }
 
 void* it_value(hash_set_it *it)

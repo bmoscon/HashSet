@@ -86,7 +86,7 @@ int main()
   if (it) {
     do {
       printf("%s\n", (char *)it_value(it));
-    } while (it_next(it) == 0);
+    } while (it_next(it) != END);
     it_free(it);
   }
 

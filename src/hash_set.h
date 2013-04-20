@@ -76,6 +76,14 @@ typedef struct hash_set_it {
 } hash_set_it;
 
 
+enum it_return {
+  OK = 0,
+  EMPTY,
+  START,
+  END
+};
+
+
 hash_set_st* hash_set_init(size_t size, uint32_t (*hash_fp)(void *));
 void hash_set_free(hash_set_st *set);
 int hash_set_exists(hash_set_st *set, void *val, size_t size);
@@ -86,7 +94,6 @@ void hash_set_clear(hash_set_st *set);
 // Hash Set Iterator Function Definitions
 hash_set_it* it_init(hash_set_st *set);
 int it_next(hash_set_it *it);
-void it_prev(hash_set_it *it);
 void* it_value(hash_set_it *it);
 void it_free(hash_set_it *it);
 
