@@ -77,6 +77,7 @@ int main()
   hash_set_st *set = hash_set_init(SET_LEN, hash_int);
   int i;
   hash_set_it *it;
+  void **set_dump;
 
   printf("verifying inserts with overflow...\n");
   for(i = 0; i < SET_SIZE; ++i) {
@@ -117,7 +118,23 @@ int main()
   }
   
   it_free(it);
+
+  it = it_init(set);
+  assert(it);
+  set_dump = hash_set_dump(set);
+  
+  printf("verifying iterator values...\n");
+
+  for (i = 0; i < SET_SIZE; ++i) {
+    assert(*(int *)it_value(it) == *(int *)set_dump[i]);
+    it_next(it);
+  }
+
+
+  hash_set_dump_free(set_dump);
   hash_set_free(set);
+
+  printf("\n-------- PASS --------\n");
   
   return 0;
 }

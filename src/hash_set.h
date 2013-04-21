@@ -93,6 +93,8 @@ void hash_set_free(hash_set_st *set);
 int hash_set_exists(hash_set_st *set, void *val, size_t size);
 int hash_set_insert(hash_set_st *set, void *val, size_t size);
 void hash_set_clear(hash_set_st *set);
+void** hash_set_dump(hash_set_st *set);
+void hash_set_dump_free(void **d);
 
 
 // Hash Set Iterator Function Definitions

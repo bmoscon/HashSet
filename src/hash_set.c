@@ -202,6 +202,32 @@ void hash_set_clear(hash_set_st *set)
 
 }
 
+
+void** hash_set_dump(hash_set_st *set)
+{
+  int set_index;
+  int array_index = 0;
+  bucket_st *b;
+  void **array = malloc(sizeof(void*) * set->entries);
+  assert(array);
+
+  for (set_index = 0; set_index < set->len; ++set_index) {
+    b = &(set->array[set_index]);
+    
+    while (b && b->value) {
+      array[array_index++] = b->value;
+      b = b->next;
+    } 
+  }
+  
+  return (array);
+}
+
+void hash_set_dump_free(void **d)
+{
+  free(d);
+}
+
 /*
  * Helper function that finds first non-empty bucket and inits 
  * the iterator accordingly
