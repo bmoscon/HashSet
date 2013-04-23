@@ -63,7 +63,7 @@ typedef struct hash_set_st {
   uint32_t entries;
   uint32_t overflow;
   size_t len;
-  uint32_t (*hash_fp)(void *);
+  uint32_t (*hash_fp)(const void *);
   bucket_st *array;
 } hash_set_st;
 
@@ -71,7 +71,7 @@ typedef struct hash_set_st {
 // Iterator Definition 
 typedef struct hash_set_it {
   uint32_t index;
-  bucket_st *current;
+  const bucket_st *current;
   const hash_set_st* set;
 } hash_set_it;
 
@@ -88,17 +88,17 @@ enum hash_return {
 };
 
 
-hash_set_st* hash_set_init(size_t size, uint32_t (*hash_fp)(void *));
+hash_set_st* hash_set_init(const size_t size, uint32_t (* const hash_fp)(const void *));
 void hash_set_free(hash_set_st *set);
-int hash_set_exists(hash_set_st *set, void *val, size_t size);
-int hash_set_insert(hash_set_st *set, void *val, size_t size);
+int hash_set_exists(const hash_set_st *set, const void *val, const size_t size);
+int hash_set_insert(hash_set_st *set, const void *val, const size_t size);
 void hash_set_clear(hash_set_st *set);
-void** hash_set_dump(hash_set_st *set);
+void** hash_set_dump(const hash_set_st *set);
 void hash_set_dump_free(void **d);
 
 
 // Hash Set Iterator Function Definitions
-hash_set_it* it_init(hash_set_st *set);
+hash_set_it* it_init(const hash_set_st *set);
 int it_next(hash_set_it *it);
 void* it_value(hash_set_it *it);
 void it_free(hash_set_it *it);

@@ -51,7 +51,7 @@
 #include "hash_set.h"
 
 
-hash_set_st* hash_set_init(size_t size, uint32_t (*hash_fp)(void *)) 
+hash_set_st* hash_set_init(const size_t size, uint32_t (* const hash_fp)(const void *)) 
 {
   hash_set_st *ret = NULL;
 
@@ -94,7 +94,7 @@ void hash_set_free(hash_set_st *set)
   free(set);
 }
 
-int hash_set_insert(hash_set_st *set, void *val, size_t size)
+int hash_set_insert(hash_set_st *set, const void *val, const size_t size)
 {
   uint32_t hash;
   uint32_t index;
@@ -146,7 +146,7 @@ int hash_set_insert(hash_set_st *set, void *val, size_t size)
   return (OK);
 }
 
-int hash_set_exists(hash_set_st *set, void *val, size_t size)
+int hash_set_exists(const hash_set_st *set, const void *val, const size_t size)
 {
   uint32_t hash;
   uint32_t index;
@@ -203,7 +203,7 @@ void hash_set_clear(hash_set_st *set)
 }
 
 
-void** hash_set_dump(hash_set_st *set)
+void** hash_set_dump(const hash_set_st *set)
 {
   int set_index;
   int array_index = 0;
@@ -257,7 +257,7 @@ static int init_bucket(hash_set_it *it)
 }
 
 
-hash_set_it* it_init(hash_set_st *set)
+hash_set_it* it_init(const hash_set_st *set)
 {
   hash_set_it* ret;
   ret = malloc(sizeof(hash_set_it));

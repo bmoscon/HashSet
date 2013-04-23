@@ -54,7 +54,7 @@
 #define SET_LEN 503
 #define SET_SIZE 50000
 
-uint32_t chksum(void *str) 
+uint32_t chksum(const void *str) 
 {
   char *s = (char *)str;
   int len = strlen(s);
@@ -68,7 +68,7 @@ uint32_t chksum(void *str)
   return (c);
 }
 
-uint32_t hash_int(void *number) {
+uint32_t hash_int(const void *number) {
   return (*(int *)number);
 }
 
