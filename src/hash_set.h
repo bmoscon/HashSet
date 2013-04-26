@@ -100,7 +100,7 @@ void hash_set_dump_free(void **d);
 // Hash Set Iterator Function Definitions
 hash_set_it* it_init(const hash_set_st *set);
 int it_next(hash_set_it *it);
-void* it_value(hash_set_it *it);
+const void* it_value(const hash_set_it *it);
 void it_free(hash_set_it *it);
 
 

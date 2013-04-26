@@ -260,6 +260,11 @@ static int init_bucket(hash_set_it *it)
 hash_set_it* it_init(const hash_set_st *set)
 {
   hash_set_it* ret;
+
+  if (!set) {
+    return (NULL);
+  }
+
   ret = malloc(sizeof(hash_set_it));
 
   assert(ret);
@@ -269,6 +274,7 @@ hash_set_it* it_init(const hash_set_st *set)
   ret->set = set;
 
   if (init_bucket(ret) != OK) {
+    free(ret);
     return (NULL);
   } 
   
@@ -280,6 +286,10 @@ int it_next(hash_set_it *it)
 {
   bucket_st *b;
   uint32_t index;
+
+  if (!it || !it->current) {
+    return (ERROR);
+  }
 
   // check if there are overflowed buckets in our current position in the array
   if (it->current->next) {
@@ -310,9 +320,13 @@ int it_next(hash_set_it *it)
   return (OK);
 }
 
-void* it_value(hash_set_it *it)
+const void* it_value(const hash_set_it *it)
 {
-  return (it->current->value);
+  if (it && it->current) {
+    return (it->current->value);
+  }
+  
+  return (NULL);
 }
 
 void it_free(hash_set_it *it)

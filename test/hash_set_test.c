@@ -130,7 +130,7 @@ int main()
     it_next(it);
   }
 
-
+  it_free(it);
   hash_set_dump_free(set_dump);
   hash_set_free(set);
 
