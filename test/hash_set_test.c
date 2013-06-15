@@ -51,8 +51,7 @@
 #include "../src/hash_set.h"
 
 
-#define SET_LEN 503
-#define SET_SIZE 50000
+#define SET_SIZE 500000
 
 uint32_t chksum(const void *str) 
 {
@@ -69,12 +68,12 @@ uint32_t chksum(const void *str)
 }
 
 uint32_t hash_int(const void *number) {
-  return (*(int *)number);
+  return ((*(int *)number) % 50000);
 }
 
 int main()
 {
-  hash_set_st *set = hash_set_init(SET_LEN, hash_int);
+  hash_set_st *set = hash_set_init(hash_int);
   int i;
   hash_set_it *it;
   void **set_dump;
@@ -89,11 +88,6 @@ int main()
     assert(hash_set_insert(set, &i, sizeof(int)) == DUPLICATE);
   }
 
-  printf("verifying data structure integrity...\n");
-  assert(set->len == SET_LEN);
-  if (SET_SIZE > SET_LEN) {
-    assert(set->overflow >= SET_SIZE - SET_LEN);
-  }
   assert(set->entries == SET_SIZE);
   
   printf("verifying values exist...\n");

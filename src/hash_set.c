@@ -50,12 +50,12 @@
 
 #include "hash_set.h"
 
+#define BASE_SIZE 1024
 
-hash_set_st* hash_set_init(const size_t size, uint32_t (* const hash_fp)(const void *)) 
+
+hash_set_st* hash_set_init(uint32_t (* const hash_fp)(const void *)) 
 {
   hash_set_st *ret = NULL;
-
-  assert(size > 0);
 
   ret = (hash_set_st *)malloc(sizeof(hash_set_st));
   assert(ret);
@@ -63,23 +63,18 @@ hash_set_st* hash_set_init(const size_t size, uint32_t (* const hash_fp)(const v
   ret->entries = 0;
   ret->overflow = 0;
   ret->hash_fp = hash_fp;
-  ret->len = size;
-  ret->array = calloc(size, sizeof(bucket_st));
+  ret->len = BASE_SIZE;
+  ret->array = calloc(ret->len, sizeof(bucket_st));
   assert(ret->array);
 
   return (ret);
 }
 
-
-void hash_set_free(hash_set_st *set)
+static void hash_set_free_array(hash_set_st *set)
 {
   bucket_st *next = NULL;
   size_t i;
   
-  if (!set) {
-    return;
-  }
-
   for (i = 0; i < set->len; ++i) {
     next = set->array[i].next;
     free(set->array[i].value);
@@ -90,17 +85,69 @@ void hash_set_free(hash_set_st *set)
       next = set->array[i].next;
     }
   }
+
   free(set->array);
+}
+
+void hash_set_free(hash_set_st *set)
+{ 
+  if (!set) {
+    return;
+  }
+
+  hash_set_free_array(set);
+
   free(set);
+}
+
+static int hash_set_realloc(hash_set_st *set)
+{
+  // allocate new set
+  hash_set_st new_set;
+
+  new_set.entries = 0;
+  new_set.overflow = 0;
+  new_set.hash_fp = set->hash_fp;
+  new_set.len = set->len * 2;
+  new_set.array = calloc(new_set.len, sizeof(bucket_st));
+  assert(new_set.array);
+  
+  // copy over old set
+  int set_index;
+  bucket_st *b;
+  
+  for (set_index = 0; set_index < set->len; ++set_index) {
+    b = &(set->array[set_index]);
+    
+    while (b && b->value) {
+      hash_set_insert(&new_set, b->value, b->size);
+      b = b->next;
+    } 
+  }
+  
+  // delete old array
+  hash_set_free_array(set);
+  
+  // set new fields
+  set->entries = new_set.entries;
+  set->overflow = new_set.overflow;
+  set->hash_fp = new_set.hash_fp;
+  set->len = new_set.len;
+  set->array = new_set.array;
+  return (OK);
 }
 
 int hash_set_insert(hash_set_st *set, const void *val, const size_t size)
 {
   uint32_t hash;
   uint32_t index;
+
+  if ((set->entries - set->overflow) > (set->len * .75)) {
+    assert(hash_set_realloc(set) == OK);
+  }
   
   hash = set->hash_fp(val);
-  index = hash % set->len;
+  index = hash &  (set->len - 1);
   
   if (hash_set_exists(set, val, size)) {
     return (DUPLICATE);
@@ -153,7 +200,7 @@ int hash_set_exists(const hash_set_st *set, const void *val, const size_t size)
   bucket_st *b;
 
   hash = set->hash_fp(val);
-  index = hash % set->len;
+  index = hash & (set->len - 1);
 
   b = &(set->array[index]);
 

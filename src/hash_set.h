@@ -88,7 +88,7 @@ enum hash_return {
 };
 
 
-hash_set_st* hash_set_init(const size_t size, uint32_t (* const hash_fp)(const void *));
+hash_set_st* hash_set_init(uint32_t (* const hash_fp)(const void *));
 void hash_set_free(hash_set_st *set);
 int hash_set_exists(const hash_set_st *set, const void *val, const size_t size);
 int hash_set_insert(hash_set_st *set, const void *val, const size_t size);
