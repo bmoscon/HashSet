@@ -142,16 +142,16 @@ int hash_set_insert(hash_set_st *set, const void *val, const size_t size)
   uint32_t hash;
   uint32_t index;
 
+  if (hash_set_exists(set, val, size)) {
+    return (DUPLICATE);
+  }
+  
   if ((set->entries - set->overflow) > (set->len * .75)) {
     assert(hash_set_realloc(set) == OK);
   }
   
   hash = set->hash_fp(val);
   index = hash &  (set->len - 1);
-  
-  if (hash_set_exists(set, val, size)) {
-    return (DUPLICATE);
-  }
   
   if (!set->array[index].value) {
     set->array[index].hash = hash;
