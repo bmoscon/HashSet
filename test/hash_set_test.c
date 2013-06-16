@@ -80,7 +80,7 @@ int main()
 
   printf("verifying inserts with overflow...\n");
   for(i = 0; i < SET_SIZE; ++i) {
-    assert(hash_set_insert(set, &i, sizeof(int)));
+    assert(hash_set_insert(set, &i, sizeof(int)) == OK);
   }
 
   printf("verifying duplicate inserts fail...\n");
